@@ -169,24 +169,30 @@ class TreeNode:
         )
 
     def insert(self, node):
+        self.display_keys()
         self.__insert(node, self.min_depth())
+        self.display_keys()
 
     def __insert(self, node, min_depth, depth=1, inserted=False):
-        if TreeNode.__is_none(self.left) and not inserted and depth == min_depth:
+        if depth > min_depth:
+            # Don't look deeper than level where blank spot is.
+            return False
+        elif TreeNode.__is_none(self.left) and not inserted:
+            # If first blank spot from the left at right branch found - insert node:
             self.left = node
             self.left.parent = self
             return True
-        elif TreeNode.__is_none(self.right) and not inserted and depth == min_depth:
+        elif TreeNode.__is_none(self.right) and not inserted:
+            # If first blank spot from the left at left branch found - insert node:
             self.right = node
             self.right.parent = self
             return True
-        elif TreeNode.__is_leaf(self):
-            return False
 
         inserted = TreeNode.__insert(
             self.left, node, min_depth, depth + 1, inserted  # type: ignore
         )
         if not inserted:
+            # if node already inserted, don't look further.
             inserted = TreeNode.__insert(
                 self.right, node, min_depth, depth + 1, inserted  # type: ignore
             )
@@ -195,33 +201,6 @@ class TreeNode:
             return True
         else:
             return False
-
-    # def __insert(self, node, min_depth, level=1, complete=None):
-    #     print(self, min_depth, level)
-    #     if TreeNode.__is_none(self):
-    #         # if is None it means it is blank spot somewhere in the middle of the tree,
-    #         # because algorithm returns if encounters a leaf.
-    #         return False
-
-    #     if TreeNode.__is_leaf(self) and min_depth != level:
-    #         # Return if node is a leaf and is higher than blank spot in the middle of
-    #         # the tree.
-    #         return
-    #     elif TreeNode.__is_leaf(self) and min_depth == level:
-    #         # Case, when leaf is parent node. No blank spots in the middle of the
-    #         # tree.
-    #         print(self)
-    #         print("Ø")
-    #         self.right
-    #         return True
-
-    #     complete = TreeNode.__insert(self.left, node, min_depth, level + 1, complete)  # type: ignore
-
-    #     if complete == None:
-    #         complete = TreeNode.__insert(self.right, node, min_depth, level + 1, complete)  # type: ignore
-
-    #     if complete:
-    #         return True
 
 
 class TreeMap:

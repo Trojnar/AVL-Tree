@@ -253,19 +253,16 @@ class TestTreeMap(TestCase):
 
     def test_insert_method(self):
         # blank on the left at 3rd level in 5 level tree
-        self.tree_maps["tree_map"].display_keys()
         self.tree_maps["tree_map"].insert(1, None)
         self.assertEqual(self.tree_maps["tree_map"].root.right.left.key, 1)
         self.assertEqual(self.tree_maps["tree_map"].root.right.left.parent.key, 9)
-        self.tree_maps["tree_map"].display_keys()
         self.tree_maps["tree_map"].insert(3, None)
+        self.tree_maps["tree_map"].root.display_keys()
         self.assertEqual(self.tree_maps["tree_map"].root.left.left.left.key, 3)
         self.assertEqual(self.tree_maps["tree_map"].root.left.left.left.parent.key, 2)
-        self.tree_maps["tree_map"].display_keys()
         self.tree_maps["tree_map"].insert(8, None)
         self.assertEqual(self.tree_maps["tree_map"].root.left.left.right.key, 8)
         self.assertEqual(self.tree_maps["tree_map"].root.left.left.right.parent.key, 2)
-        self.tree_maps["tree_map"].display_keys()
 
         # Blank on the right at 3rd level in 5 level tree
 
@@ -323,10 +320,6 @@ class TestTreeMap(TestCase):
         self.assertEqual(self.tree.root.left.left.left.value, 8)
         self.assertEqual(self.tree.root.right.left.right.value, 13)
 
-    # def test_test(self):
-    #     self.tree_maps["tree_map"].display_keys()
-    #     min_depth = self.tree_maps["tree_map"].min_depth()
-    #     self.tree_maps["tree_map"].root.test(min_depth)
 
 
 if __name__ == "__main__":
