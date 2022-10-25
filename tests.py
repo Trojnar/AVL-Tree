@@ -1,3 +1,5 @@
+# type: ignore
+
 from unittest import TestCase
 import unittest
 from tree import TreeMap
@@ -87,10 +89,12 @@ class TestTreeMap(TestCase):
             ),
         }
 
-    # def _display_test_cases(self):
-    #     # Helper method for debugging
-    #     for tree_map in self.tree_maps:
-    #         tree_map.display_keys()
+    def _display_test_cases(self):
+        # Helper method for debugging
+        for key, tree_map in self.tree_maps:
+            print(key)
+            tree_map.display_keys()
+            print()
 
     def test_create_tree_map_from_tuple(self):
         self.assertEqual(self.tree_maps["tree_map"].root.key, 1)
@@ -222,32 +226,80 @@ class TestTreeMap(TestCase):
         self.assertEqual(self.tree_maps["only_left_tree_map"].min_depth(), 1)
 
     def test_traverse_inorder(self):
-        self.assertEqual(
-            self.tree_maps["balanced_binary_tree_4_levels_height"].traverse_inorder(),
-            [4, 10, 12, 15, 18, 22, 24, 25, 31, 25, 44, 50, 66, 70, 90],
+        keys = list(
+            map(
+                lambda x: x.key,
+                self.tree_maps[
+                    "balanced_binary_tree_4_levels_height"
+                ].traverse_inorder(),
+            )
         )
         self.assertEqual(
-            self.tree_maps["balanced_binary_tree_3_levels_height"].traverse_inorder(),
+            keys,
+            [4, 10, 12, 15, 18, 22, 24, 25, 31, 25, 44, 50, 66, 70, 90],
+        )
+        keys = list(
+            map(
+                lambda x: x.key,
+                self.tree_maps[
+                    "balanced_binary_tree_3_levels_height"
+                ].traverse_inorder(),
+            )
+        )
+        self.assertEqual(
+            keys,
             [4, 2, 5, 1, 6, 3, 7],
         )
 
     def test_traverse_preorder(self):
-        self.assertEqual(
-            self.tree_maps["balanced_binary_tree_4_levels_height"].traverse_preorder(),
-            [25, 15, 10, 4, 12, 22, 18, 24, 50, 25, 31, 44, 70, 66, 90],
+        keys = list(
+            map(
+                lambda x: x.key,
+                self.tree_maps[
+                    "balanced_binary_tree_4_levels_height"
+                ].traverse_preorder(),
+            )
         )
         self.assertEqual(
-            self.tree_maps["balanced_binary_tree_3_levels_height"].traverse_preorder(),
+            keys,
+            [25, 15, 10, 4, 12, 22, 18, 24, 50, 25, 31, 44, 70, 66, 90],
+        )
+        keys = list(
+            map(
+                lambda x: x.key,
+                self.tree_maps[
+                    "balanced_binary_tree_3_levels_height"
+                ].traverse_preorder(),
+            )
+        )
+        self.assertEqual(
+            keys,
             [1, 2, 4, 5, 3, 6, 7],
         )
 
     def test_traverse_postorder(self):
-        self.assertEqual(
-            self.tree_maps["balanced_binary_tree_4_levels_height"].traverse_postorder(),
-            [4, 12, 10, 18, 24, 22, 15, 31, 44, 25, 66, 90, 70, 50, 25],
+        keys = list(
+            map(
+                lambda x: x.key,
+                self.tree_maps[
+                    "balanced_binary_tree_4_levels_height"
+                ].traverse_postorder(),
+            )
         )
         self.assertEqual(
-            self.tree_maps["balanced_binary_tree_3_levels_height"].traverse_postorder(),
+            keys,
+            [4, 12, 10, 18, 24, 22, 15, 31, 44, 25, 66, 90, 70, 50, 25],
+        )
+        keys = list(
+            map(
+                lambda x: x.key,
+                self.tree_maps[
+                    "balanced_binary_tree_3_levels_height"
+                ].traverse_postorder(),
+            )
+        )
+        self.assertEqual(
+            keys,
             [4, 5, 2, 6, 7, 3, 1],
         )
 
@@ -257,7 +309,6 @@ class TestTreeMap(TestCase):
         self.assertEqual(self.tree_maps["tree_map"].root.right.left.key, 1)
         self.assertEqual(self.tree_maps["tree_map"].root.right.left.parent.key, 9)
         self.tree_maps["tree_map"].insert(3, None)
-        self.tree_maps["tree_map"].root.display_keys()
         self.assertEqual(self.tree_maps["tree_map"].root.left.left.left.key, 3)
         self.assertEqual(self.tree_maps["tree_map"].root.left.left.left.parent.key, 2)
         self.tree_maps["tree_map"].insert(8, None)
@@ -320,6 +371,145 @@ class TestTreeMap(TestCase):
         self.assertEqual(self.tree.root.left.left.left.value, 8)
         self.assertEqual(self.tree.root.right.left.right.value, 13)
 
+    def test_to_list(self):
+        node1 = TreeNode(1, 1)
+        node2 = TreeNode(2, 2)
+        node3 = TreeNode(3, 3)
+        # only root node in the tree
+        self.tree_map = TreeMap(node1)
+        self.assertEqual(self.tree_map.to_list(), [node1])
+
+        # three nodes
+        self.tree_map.insert_node(node2)
+        self.tree_map.insert_node(node3)
+        self.assertEqual(self.tree_map.to_list(), [node1, node2, node3])
+
+        # different order of nodes
+        self.tree_map = TreeMap(node3)
+        self.tree_map.insert_node(node2)
+        self.tree_map.insert_node(node1)
+        self.assertEqual(self.tree_map.to_list(), [node1, node2, node3])
+
+        # unbalanced tree
+        self.assertEqual(
+            self.tree_maps["tree_map"].to_list(),
+            [
+                TreeNode(1, None),
+                TreeNode(2, None),
+                TreeNode(5, None),
+                TreeNode(6, None),
+                TreeNode(7, None),
+                TreeNode(9, None),
+                TreeNode(9, None),
+            ],
+        )
+
+    def test_insert_node(self):
+        # adding node
+        self.tree_maps["balanced_binary_tree_4_levels_height"].insert_node(
+            TreeNode(1, 3)
+        )
+        self.tree_maps["balanced_binary_tree_4_levels_height"].insert_node(
+            TreeNode(1, 3)
+        )
+        self.assertEqual(
+            self.tree_maps[
+                "balanced_binary_tree_4_levels_height"
+            ].root.left.left.left.left.key,
+            1,
+        )
+        self.assertEqual(
+            self.tree_maps[
+                "balanced_binary_tree_4_levels_height"
+            ].root.left.left.left.right.key,
+            1,
+        )
+
+        # adding to blank root
+        self.tree_map = TreeMap(TreeNode(None, None))
+        self.tree_map.insert_node(TreeNode(1, 2))
+        self.assertEqual(self.tree_map.root.key, 1)
+        self.assertIsNone(self.tree_map.root.left)
+
+        # adding free node
+        self.tree_map2 = TreeMap(TreeNode(1, None))
+        node = TreeNode(3, None)
+        self.tree_map2.insert_node(node)
+        self.assertEqual(self.tree_map2.root.left, node)
+        self.assertIs(self.tree_map2.root.left, node)
+
+        # node already have parent
+        self.tree_map.insert_node(TreeNode(1, None))
+        self.tree_map3 = TreeMap(TreeNode(1, None))
+        self.tree_map3.insert_node(self.tree_map.root.left)
+        self.assertIsNotNone(self.tree_map.root.left.parent)
+        self.assertEqual(self.tree_map3.root.left, self.tree_map.root.left)
+        self.assertIsNot(self.tree_map3.root.left, self.tree_map.root.left)
+
+        # node already have parent and childs
+        self.tree_map4 = TreeMap(TreeNode(1, None))
+        node = self.tree_maps["balanced_binary_tree_4_levels_height"].root.left
+        self.assertIs(node, self.tree_maps["balanced_binary_tree_4_levels_height"].root.left)
+        self.tree_map4.insert_node(node)
+        self.assertEqual(node, self.tree_map4.root.left)
+        self.assertIsNot(node, self.tree_map4.root.left)
+
+    def test_eq_(self):
+        node1 = TreeNode(1, 1)
+        node2 = TreeNode(2, 2)
+        node3 = TreeNode(3, 3)
+        node4 = TreeNode(4, 4)
+        node5 = TreeNode(4, 4)
+        self.tree_map = TreeMap(node1)
+        self.tree_map.insert_node(node2)
+        self.tree_map.insert_node(node3)
+        self.assertEqual(node1, node1)
+        self.assertEqual(node5.left, node5.right)
+        self.assertEqual(node5.left, None)
+        # None None
+        self.assertEqual(node5.left, node5.left)
+        # node2 node2
+        self.assertEqual(self.tree_map.root.left, self.tree_map.root.left)
+        # node2 node3
+        self.assertNotEqual(self.tree_map.root.right, self.tree_map.root.left)
+        # node3 None
+        self.assertNotEqual(self.tree_map.root.right, self.tree_map.root.right.right)
+        self.assertEqual(self.tree_map.root.right.right, None)
+
+        # same key values different parents and childs
+        node1 = TreeNode(1, 1)
+        node2 = TreeNode(2, 2)
+        node3 = TreeNode(3, 3)
+        node4 = TreeNode(2, 2)
+        self.tree_map2 = TreeMap(node1)
+        self.tree_map2.insert_node(node2)
+        self.tree_map2.insert_node(node3)
+        self.tree_map2.insert_node(node4)
+        self.assertEqual(node2, node4)
+        self.assertEqual(
+            self.tree_map2.root.right.right, self.tree_map2.root.right.left
+        )
+
+    def test_is_child(self):
+        pass
+
+    def test_subtrees_eq(self):
+        pass
+
+    def test_find(self):
+        self.tree_maps["tree_map"].display_keys()
+        tree_l = self.tree_maps["tree_map"].to_list()
+
+    ### TreeNode methods ###
+    def test_is_free(self):
+        free_node = TreeNode(1, 1)
+        self.assertEqual(free_node.is_free(), True)
+
+        bounded_node = TreeNode(1, 1)
+        bounded_node2 = TreeNode(2, 2)
+        bounded_node.insert(bounded_node2)
+        self.assertEqual(bounded_node.is_free(), False)
+        self.assertEqual(bounded_node2.is_free(), False)
 
 
 if __name__ == "__main__":

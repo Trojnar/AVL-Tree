@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Optional
+from typing import Iterable, Optional, Union
 
 
 class TreeNode:
@@ -21,12 +21,12 @@ class TreeNode:
 
     """
 
-    def __init__(self, key, value, left=None, right=None, parent=None):
+    def __init__(self, key, value):
         self.__key = key
         self.value = value
-        self.__left = left
-        self.__right = right
-        self.__parent = parent
+        self.__left = None
+        self.__right = None
+        self.__parent = None
 
     @property
     def key(self):
@@ -49,27 +49,24 @@ class TreeNode:
         if isinstance(new_left, TreeNode):
             self.__left = new_left
         else:
-            raise Exception("Data type of the attribute left should be TreeNode().")
+            raise Exception("Attribute left should be of type TreeNode.")
 
     @right.setter
     def right(self, new_right):
         if isinstance(new_right, TreeNode):
             self.__right = new_right
         else:
-            raise Exception("Data type of the attribute right should be TreeNode().")
+            raise Exception("Attribute right should be of type TreeNode.")
 
     @parent.setter
     def parent(self, new_parent):
         if isinstance(new_parent, TreeNode):
             self.__parent = new_parent
         else:
-            raise Exception("Data type of the attribute parent should be TreeNode().")
+            raise Exception("Attribute parent should be of type TreeNode.")
 
     def __repr__(self):
-        return (
-            f"{self.__class__.__name__}({self.key}, {self.value}, {self.left}, "
-            f"{self.right}, {self.parent})"
-        )
+        return f"{self.__class__.__name__}({self.key}, {self.value})"
 
     def __str__(self):
         return str(self.key)
@@ -89,9 +86,15 @@ class TreeNode:
             return True
         return False
 
-    def to_tuple(self) -> Optional[tuple]:
+    def to_tuple(self) -> tuple:
+        """
+        Returns
+        -------
+        tuple
+            Tuple of keys in (left-subtree, key, right-subtree) order.
+        """
         if TreeNode.__is_none(self):
-            return None
+            return None  # type: ignore
 
         return (
             TreeNode.to_tuple(self.left),  # type: ignore
@@ -143,7 +146,7 @@ class TreeNode:
 
         return (
             TreeNode.traverse_inorder(self.left)  # type: ignore
-            + [self.key]
+            + [self]
             + TreeNode.traverse_inorder(self.right)  # type: ignore
         )
 
@@ -152,7 +155,7 @@ class TreeNode:
         if TreeNode.__is_none(self):
             return []
         return (
-            [self.key]
+            [self]
             + TreeNode.traverse_preorder(self.left)  # type: ignore
             + TreeNode.traverse_preorder(self.right)  # type: ignore
         )
@@ -165,25 +168,27 @@ class TreeNode:
         return (
             TreeNode.traverse_postorder(self.left)  # type: ignore
             + TreeNode.traverse_postorder(self.right)  # type: ignore
-            + [self.key]
+            + [self]
         )
 
     def insert(self, node):
-        self.display_keys()
+        if TreeNode.__is_none(self):
+            # If root is blank node - replace instance attributes and return.
+            self.__dict__ = node.__dict__
+            return
         self.__insert(node, self.min_depth())
-        self.display_keys()
 
     def __insert(self, node, min_depth, depth=1, inserted=False):
         if depth > min_depth:
             # Don't look deeper than level where blank spot is.
             return False
         elif TreeNode.__is_none(self.left) and not inserted:
-            # If first blank spot from the left at right branch found - insert node:
+            # If first blank spot from the left at left branch found - insert node:
             self.left = node
             self.left.parent = self
             return True
         elif TreeNode.__is_none(self.right) and not inserted:
-            # If first blank spot from the left at left branch found - insert node:
+            # If first blank spot from the left at right branch found - insert node:
             self.right = node
             self.right.parent = self
             return True
@@ -201,6 +206,35 @@ class TreeNode:
             return True
         else:
             return False
+
+    def __eq__(self, other):
+        """
+        If key and value are the same for self and other, node is considered equal.
+        """
+        if not isinstance(other, TreeNode):
+            if type(self) == None and type(other) == None:
+                return True
+            elif (type(self) == None and type(other) != None) or (
+                type(self) != None and type(other) == None
+            ):
+                return False
+            else:
+                return NotImplemented
+
+        return self.key == other.key and self.value == other.value
+
+    def is_free(self):
+        """
+        Check if node is assigned to any tree.
+
+        Returns
+        -------
+        bool
+            If node is assigned to tree return False else return True.
+        """
+        if self.parent or self.right or self.left:
+            return False
+        return True
 
 
 class TreeMap:
@@ -248,16 +282,68 @@ class TreeMap:
 
     def insert(self, key, value):
         """
-        Allows to insert node to the tree. Node is added to the first available place
-        from the left.
+        Allows to insert key, value to the tree as node. Node is added to the first
+        available place from the left. Always creates new TreeNode.
 
         Parameters
         ----------
-        node
-            Node to insert.
+        key
+            Key of the node.
+        value
+            Value of the node.
         """
         node = TreeNode(key, value)
         self.root.insert(node)
+
+    def insert_node(self, node: TreeNode):
+        """
+        Allows to insert node to the tree. Node is added to the first free branch from
+        the left. Creates new node only if given node is already bound.
+
+        Parameters
+        ----------
+        node : TreeNode
+            Node to insert.
+        """
+        if isinstance(node, TreeNode):
+            if node.is_free():
+                self.root.insert(node)
+            else:
+                self.root.insert(TreeNode(node.key, node.value))
+        else:
+            return False
+
+    def to_list(self):
+        """
+        Returns list of nodes sorted by key.
+
+        Returns
+        -------
+        list
+            List of nodes sorted by key.
+
+        """
+        nodes = self.root.traverse_inorder()
+        nodes.sort(key=lambda x: x.key)
+        return nodes
+
+    def parse_list(self, nodes_l: Union[list[TreeNode], list[tuple], list[list]]):
+        """
+        Parse given list placing every next node of the list in first from left
+        possible spot.
+
+        Parameters
+        ----------
+        nodes_l : Union[list[TreeNode], list[tuple], list[list]]
+            list of TreeNode instances or list of key-value pair iterable where the
+            first index is key and second is value.
+        """
+        if isinstance(nodes_l[0], TreeNode):
+            for node in nodes_l:
+                self.insert(node.key, node.value)  # type: ignore
+        elif isinstance(nodes_l[0], list) or isinstance(nodes_l[0], tuple):
+            for node in nodes_l:
+                self.insert(node[0], node[1])  # type: ignore
 
     def find(self, key) -> TreeNode:
         """
@@ -273,7 +359,31 @@ class TreeMap:
         TreeNode
             Node of given key or None if not found.
         """
-        pass
+
+        return TreeMap.binary_search_nodes(self.to_list(), key)
+
+    @staticmethod
+    def __binary_search_nodes(nodes: list[TreeNode], key, node=None) -> TreeNode:
+        """
+        Search through sorted list of nodes
+
+        Parameters
+        ----------
+        nodes : list
+            List of sorted nodes to search in.
+
+        Returns
+        -------
+        node : TreeNode
+            Found node.
+        """
+        mid = (len(nodes) - 1) // 2
+        if nodes[mid].key == key:
+            return nodes[mid]
+        elif nodes[mid].key > key:
+            return TreeMap.binary_search_nodes(nodes[:mid], key)
+        elif nodes[mid].key < key:
+            return TreeMap.binary_search_nodes(nodes[mid:], key)
 
     def update(self, key, value) -> bool:
         """
@@ -304,13 +414,13 @@ class TreeMap:
     @classmethod
     def parse_tuple(cls, tree_t: tuple) -> TreeMap:
         """
-        Parse given tuple organized in form (left_subtree, root, right_subtree).
+        Parse given tuple of keys organized in form (left_subtree, root, right_subtree).
 
         Parameters
         ----------
         tree : tuple
-            tuple of key-value paris of the tree organized in form of
-            (left_subtree, key-value, right_subtree).
+            tuple of keys of the tree organized in form of
+            (left_subtree, key, right_subtree).
 
         Returns
         --------
@@ -322,10 +432,11 @@ class TreeMap:
 
     @staticmethod
     def __create_tree_from_tuple(tree_t: tuple):
-        """Creates tree from tuple and returns root node."""
+        """Creates tree from tuple of keys and returns root node."""
         if tree_t is None:
+            # TODO : Make Nones at the end of the tree not TreeNode(None, None)
             return TreeNode(None, None)
-        tree_node = TreeNode(tree_t[1], tree_t[1])
+        tree_node = TreeNode(tree_t[1], None)
         tree_node.left = TreeMap.__create_tree_from_tuple(tree_t[0])
         tree_node.left.parent = tree_node
         tree_node.right = TreeMap.__create_tree_from_tuple(tree_t[2])
@@ -333,7 +444,7 @@ class TreeMap:
         return tree_node
 
     def traverse_preorder(self) -> list:
-        """
+        """No
         Traverse tree preorder. Returns list.
 
         Returns
@@ -404,3 +515,45 @@ class TreeMap:
             Minimal height/depth of the tree.
         """
         return self.root.min_depth()
+
+    def subtrees_eq(self, other):
+        # TODO
+        """
+        Method checks if subtrees starting from root down are the same.
+        """
+        if (type(self) == type(None) and type(other) != type(None)) or (
+            type(self) != type(None) and type(other) == type(None)
+        ):
+            return False
+        elif type(self) == type(None) and type(other) == type(None):
+            return True
+
+        if not isinstance(other, TreeNode):
+            return NotImplemented
+
+        return (
+            self.key == other.key
+            and self.value == other.value
+            and self.left == other.left
+            and self.right == other.right
+        )
+
+    def is_child(self, child, other):
+        # TODO
+        """
+        Method checks node is child of other node.
+        """
+        if (type(self) == type(None) and type(other) != type(None)) or (
+            type(self) != type(None) and type(other) == type(None)
+        ):
+            return False
+        elif type(self) == type(None) and type(other) == type(None):
+            return True
+
+        if not isinstance(other, TreeNode):
+            return NotImplemented
+
+        return self.key == other.key and self.value == other.value and self.parent
+
+    def __repr__(self) -> str:
+        return str(self.to_tuple())
