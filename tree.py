@@ -1,4 +1,5 @@
 from __future__ import annotations
+from types import NoneType
 from typing import Iterable, Optional, Union
 
 
@@ -323,6 +324,7 @@ class TreeMap:
             List of nodes sorted by key.
 
         """
+
         nodes = self.root.traverse_inorder()
         nodes.sort(key=lambda x: x.key)
         return nodes
@@ -345,9 +347,9 @@ class TreeMap:
             for node in nodes_l:
                 self.insert(node[0], node[1])  # type: ignore
 
-    def find(self, key) -> TreeNode:
+    def find(self, key) -> Optional[list]:
         """
-        Finds node of given key.
+        Finds nodes of given key.
 
         Parameters
         ----------
@@ -356,34 +358,80 @@ class TreeMap:
 
         Returns
         -------
-        TreeNode
-            Node of given key or None if not found.
+        list[TreeNode]
+            list of found nodes.
         """
-
-        return TreeMap.binary_search_nodes(self.to_list(), key)
+        nodes_l = self.to_list()
+        first = self.__find_first_occurrence(self.to_list(), key)
+        if first == None:
+            # if node not found
+            return None
+        last = self.__find_last_occurrence(self.to_list(), key)
+        return nodes_l[first[1] : last[1] + 1]
 
     @staticmethod
-    def __binary_search_nodes(nodes: list[TreeNode], key, node=None) -> TreeNode:
+    def __find_first_occurrence(nodes: list[TreeNode], key, lo=0) -> Optional[tuple]:
         """
-        Search through sorted list of nodes
+        Search through sorted list of nodes and find first occurrence of the given key.
 
         Parameters
         ----------
         nodes : list
             List of sorted nodes to search in.
+        key
+            Key of wanted node
 
         Returns
         -------
-        node : TreeNode
-            Found node.
+        tuple
+            (last_node, index of the first node)
+
         """
-        mid = (len(nodes) - 1) // 2
-        if nodes[mid].key == key:
-            return nodes[mid]
+        mid = len(nodes) // 2
+        if len(nodes) >= 2 and nodes[mid].key == key and nodes[mid - 1].key == key:
+            return TreeMap.__find_first_occurrence(nodes[:mid], key, lo)
+        elif nodes[mid].key == key:
+            return (nodes[mid], lo + mid)
+        elif len(nodes) == 1:
+            return None
         elif nodes[mid].key > key:
-            return TreeMap.binary_search_nodes(nodes[:mid], key)
+            return TreeMap.__find_first_occurrence(nodes[:mid], key, lo)
         elif nodes[mid].key < key:
-            return TreeMap.binary_search_nodes(nodes[mid:], key)
+            return TreeMap.__find_first_occurrence(nodes[mid:], key, lo + mid)
+
+        return None
+
+    @staticmethod
+    def __find_last_occurrence(nodes: list[TreeNode], key, lo=0) -> Optional[tuple]:
+        """
+        Search through sorted list of nodes and find last occurrence of the given key.
+
+        Parameters
+        ----------
+        nodes : list
+            List of sorted nodes to search in.
+        key
+            Key of wanted node.
+
+        Returns
+        -------
+        tuple
+            (last node, index of the last node)
+
+        """
+        mid = len(nodes) // 2
+        if len(nodes) >= 3 and nodes[mid].key == key and nodes[mid + 1].key == key:
+            return TreeMap.__find_last_occurrence(nodes[mid:], key, lo + mid)
+        elif nodes[mid].key == key:
+            return (nodes[mid], lo + mid)
+        elif len(nodes) == 1:
+            return None
+        elif nodes[mid].key > key:
+            return TreeMap.__find_last_occurrence(nodes[:mid], key, lo)
+        elif nodes[mid].key < key:
+            return TreeMap.__find_last_occurrence(nodes[mid:], key, lo + mid)
+
+        return None
 
     def update(self, key, value) -> bool:
         """

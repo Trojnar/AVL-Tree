@@ -449,7 +449,9 @@ class TestTreeMap(TestCase):
         # node already have parent and childs
         self.tree_map4 = TreeMap(TreeNode(1, None))
         node = self.tree_maps["balanced_binary_tree_4_levels_height"].root.left
-        self.assertIs(node, self.tree_maps["balanced_binary_tree_4_levels_height"].root.left)
+        self.assertIs(
+            node, self.tree_maps["balanced_binary_tree_4_levels_height"].root.left
+        )
         self.tree_map4.insert_node(node)
         self.assertEqual(node, self.tree_map4.root.left)
         self.assertIsNot(node, self.tree_map4.root.left)
@@ -497,8 +499,60 @@ class TestTreeMap(TestCase):
         pass
 
     def test_find(self):
-        self.tree_maps["tree_map"].display_keys()
-        tree_l = self.tree_maps["tree_map"].to_list()
+        self.assertEqual(self.tree_maps["tree_map"].find(5), [TreeNode(5, None)])
+
+        # keys are repeating
+        self.tree_maps["tree_map"].root.right.value = 5
+        self.assertEqual(
+            self.tree_maps["tree_map"].find(9), [TreeNode(9, 5), TreeNode(9, None)]
+        )
+        self.assertIs(
+            self.tree_maps["tree_map"].find(5)[0],
+            self.tree_maps["tree_map"].root.right.right.left,
+        )
+        self.tree_repeating = TreeMap(TreeNode(1, 1))
+        self.tree_repeating.parse_list(
+            [
+                TreeNode(1, 1),
+                TreeNode(2, 2),
+                TreeNode(3, 3),
+                TreeNode(5, 4),
+                TreeNode(2, 5),
+                TreeNode(2, 6),
+                TreeNode(3, 7),
+                TreeNode(3, 8),
+                TreeNode(5, 9),
+                TreeNode(5, 10),
+                TreeNode(3, 11),
+                TreeNode(4, 12),
+                TreeNode(2, 13),
+            ]
+        )
+        self.assertEqual(
+            self.tree_repeating.find(5),
+            [TreeNode(5, 9), TreeNode(5, 4), TreeNode(5, 10)],
+        )
+        self.assertEqual(
+            self.tree_repeating.find(3),
+            [TreeNode(3, 7), TreeNode(3, 3), TreeNode(3, 8), TreeNode(3, 11)],
+        )
+        self.assertEqual(
+            self.tree_repeating.find(2),
+            [TreeNode(2, 5), TreeNode(2, 2), TreeNode(2, 13), TreeNode(2, 6)],
+        )
+        # only root tree map
+        self.tree = TreeMap(TreeNode(1, 1))
+        self.assertEqual(self.tree.find(1), [TreeNode(1, 1)])
+
+        # key not found
+        self.assertEqual(self.tree_maps["tree_map"].find(15), None)
+
+        # Wanted node at the end of the tree
+        self.assertEqual(self.tree_maps["tree_map"].find(5)[0], TreeNode(5, None))
+        self.assertIs(
+            self.tree_maps["tree_map"].find(5)[0],
+            self.tree_maps["tree_map"].root.right.right.left,
+        )
 
     ### TreeNode methods ###
     def test_is_free(self):
