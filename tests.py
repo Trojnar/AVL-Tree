@@ -554,6 +554,9 @@ class TestTreeMap(TestCase):
             self.tree_maps["tree_map"].root.right.right.left,
         )
 
+    def test_update(self):
+        pass
+
     ### TreeNode methods ###
     def test_is_free(self):
         free_node = TreeNode(1, 1)

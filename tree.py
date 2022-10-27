@@ -1,4 +1,5 @@
 from __future__ import annotations
+from curses import keyname
 from types import NoneType
 from typing import Iterable, Optional, Union
 
@@ -387,19 +388,31 @@ class TreeMap:
             (last_node, index of the first node)
 
         """
-        mid = len(nodes) // 2
-        if len(nodes) >= 2 and nodes[mid].key == key and nodes[mid - 1].key == key:
-            return TreeMap.__find_first_occurrence(nodes[:mid], key, lo)
-        elif nodes[mid].key == key:
-            return (nodes[mid], lo + mid)
-        elif len(nodes) == 1:
-            return None
-        elif nodes[mid].key > key:
-            return TreeMap.__find_first_occurrence(nodes[:mid], key, lo)
-        elif nodes[mid].key < key:
-            return TreeMap.__find_first_occurrence(nodes[mid:], key, lo + mid)
+        node, index = (None, None)
+        lo = 0
+        hi = len(nodes) - 1
 
-        return None
+        if hi == lo and nodes[hi].key == key:
+            return nodes[0], index
+
+        while hi > lo + 1:
+            mid = (hi - lo) // 2
+            if nodes[lo + mid].key == key:
+                if nodes[mid - 1].key == key:
+                    hi -= mid
+                else:
+                    node = nodes[lo + mid]
+                    index = lo + mid
+                    break
+            elif nodes[mid].key > key:
+                hi -= mid
+            elif nodes[mid].key < key:
+                lo += mid
+
+        if index == None:
+            return None
+
+        return (node, index)
 
     @staticmethod
     def __find_last_occurrence(nodes: list[TreeNode], key, lo=0) -> Optional[tuple]:
