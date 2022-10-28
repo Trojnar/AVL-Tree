@@ -1,6 +1,4 @@
 from __future__ import annotations
-from curses import keyname
-from types import NoneType
 from typing import Iterable, Optional, Union
 
 
@@ -350,25 +348,34 @@ class TreeMap:
 
     def find(self, key) -> Optional[list]:
         """
-        Finds nodes of given key.
+        Finds the nodes of given key.
 
         Parameters
         ----------
         key
-            Key of wanted node.
+            Key of the wanted node.
 
         Returns
         -------
         list[TreeNode]
-            list of found nodes.
+            list of the found nodes.
         """
         nodes_l = self.to_list()
         first = self.__find_first_occurrence(self.to_list(), key)
         if first == None:
-            # if node not found
+            # if the node of given key not found
             return None
         last = self.__find_last_occurrence(self.to_list(), key)
-        return nodes_l[first[1] : last[1] + 1]
+        return nodes_l[first[1] : last[1] + 1]  # type: ignore
+
+    def find_node(
+        self,
+        node,
+    ) -> Optional[TreeNode]:
+        """
+        Finds the same node as given node.
+        """
+        pass
 
     @staticmethod
     def __find_first_occurrence(nodes: list[TreeNode], key, lo=0) -> Optional[tuple]:
@@ -388,31 +395,27 @@ class TreeMap:
             (last_node, index of the first node)
 
         """
-        node, index = (None, None)
         lo = 0
         hi = len(nodes) - 1
-
-        if hi == lo and nodes[hi].key == key:
-            return nodes[0], index
 
         while hi > lo + 1:
             mid = (hi - lo) // 2
             if nodes[lo + mid].key == key:
-                if nodes[mid - 1].key == key:
+                if nodes[lo + mid - 1].key == key:
                     hi -= mid
                 else:
-                    node = nodes[lo + mid]
-                    index = lo + mid
+                    lo = lo + mid
+                    hi = lo
                     break
-            elif nodes[mid].key > key:
+            elif nodes[lo + mid].key > key:
                 hi -= mid
-            elif nodes[mid].key < key:
+            elif nodes[lo + mid].key < key:
                 lo += mid
 
-        if index == None:
+        if hi == lo and nodes[lo].key == key:
+            return nodes[lo], lo
+        else:
             return None
-
-        return (node, index)
 
     @staticmethod
     def __find_last_occurrence(nodes: list[TreeNode], key, lo=0) -> Optional[tuple]:
@@ -432,35 +435,44 @@ class TreeMap:
             (last node, index of the last node)
 
         """
-        mid = len(nodes) // 2
-        if len(nodes) >= 3 and nodes[mid].key == key and nodes[mid + 1].key == key:
-            return TreeMap.__find_last_occurrence(nodes[mid:], key, lo + mid)
-        elif nodes[mid].key == key:
-            return (nodes[mid], lo + mid)
-        elif len(nodes) == 1:
+        lo = 0
+        hi = len(nodes) - 1
+
+        while hi >= lo + 1:
+            mid = (hi - lo) // 2
+
+            if nodes[lo + mid].key == key:
+                if nodes[lo + mid + 1].key == key:
+                    lo += mid + 1
+                else:
+                    lo = lo + mid
+                    hi = lo
+                    break
+            elif nodes[lo + mid].key > key:
+                hi -= mid
+            elif nodes[lo + mid].key < key:
+                lo += mid
+
+        if hi == lo and nodes[lo].key == key:
+            return nodes[lo], lo
+        else:
             return None
-        elif nodes[mid].key > key:
-            return TreeMap.__find_last_occurrence(nodes[:mid], key, lo)
-        elif nodes[mid].key < key:
-            return TreeMap.__find_last_occurrence(nodes[mid:], key, lo + mid)
 
-        return None
-
-    def update(self, key, value) -> bool:
+    def update(self, node1, node2) -> bool:
         """
-        Updates node.
+        Updates the node.
 
         Parameters
         ----------
-        key
-            Key of the node to update
-        value
-            Value to update.
+        node1
+            Node to update.
+        node2
+            Node to update with.
         """
         pass
 
     def display_keys(self, root=None, level=0):
-        """Displays keys in tree-like form at stdout."""
+        """Displays the keys in tree-like form at stdout."""
         self.root.display_keys()
 
     def to_tuple(self) -> Optional[tuple]:
