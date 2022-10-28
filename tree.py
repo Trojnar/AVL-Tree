@@ -446,11 +446,8 @@ class TreeMap:
         """
         lo = 0
         hi = len(li) - 1
-        print("li: ", li, "val: ", value)
         while hi > lo:
             mid = (hi - lo) // 2
-            print(li)
-            print("hi: ", hi, "lo: ", lo, "mid: ", mid)
             if li[lo + mid] == value:
                 if hi > 2 and li[lo + mid - 1] == value:
                     hi -= mid
@@ -461,7 +458,7 @@ class TreeMap:
             elif li[lo + mid] > value:
                 hi -= mid
             elif li[lo + mid] < value:
-                lo += mid
+                lo += mid + 1
 
         if hi == lo and li[lo] == value:
             return lo

@@ -605,18 +605,28 @@ class TestTreeMap(TestCase):
         node = self.tree_repeating.find_node(TreeNode(5, 9))
         self.assertIs(node, self.tree_repeating.root.left.right.left)
         self.assertEqual(node, TreeNode(5, 9))
+
+        node = self.tree_repeating.find_node(TreeNode(3, 3))
         self.assertEqual(
             self.tree_repeating.find_node(TreeNode(3, 3)),
             TreeNode(3, 3),
         )
+        self.assertIs(node, self.tree_repeating.root.left.left)
+
+        # repeating value
+        node = self.tree_repeating.find_node(TreeNode(3, 8))
         self.assertEqual(
-            self.tree_repeating.find_node(TreeNode(3, 8)),
+            node,
             TreeNode(3, 8),
         )
+        self.assertIs(node, self.tree_repeating.root.left.left.left)
+
+        node = self.tree_repeating.find_node(TreeNode(5, None))
         self.assertEqual(
-            self.tree_repeating.find_node(TreeNode(5, None)),
+            node,
             TreeNode(5, None),
         )
+        self.assertIs(node, self.tree_repeating.root.left.right.right)
 
     def test_update(self):
         pass
