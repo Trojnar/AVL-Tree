@@ -366,21 +366,114 @@ class TreeMap:
             # if the node of given key not found
             return None
         last = self.__find_last_occurrence(self.to_list(), key)
-        return nodes_l[first[1] : last[1] + 1]  # type: ignore
+        assert last != None, "last should never be None."
+        return nodes_l[first[1] : last[1] + 1]
 
     def find_node(
         self,
-        node,
+        node: TreeNode,
     ) -> Optional[TreeNode]:
         """
         Finds the same node as given node.
+
+        Parameters
+        ----------
+            node : TreeNode
+                Node that is searched for.
+
+        Returns
+        -------
+            Optional[TreeNode]
+                Node that is searched for.
         """
-        pass
+
+        if node.key == None:
+            return None
+
+        nodes_l = self.find(node.key)
+        print("nodes_l: ", nodes_l)
+        nodes_l_val = []
+
+        if nodes_l == None:
+            return None
+
+        # make list of values with indexes if the searching for node's value is None,
+        # it's changed to -1
+        nodes_l_val = list(
+            map(
+                lambda x, y: (x.value, y) if x.value != None else (-1, y),
+                nodes_l,
+                range(len(nodes_l)),
+            )
+        )
+        print("nodes_l_val: ", nodes_l_val)
+
+        # sort list by value. If value is none move it to the end of the list
+        nodes_l_val.sort(key=lambda x: x[0])
+        print("sorted nodes_l_val: ", nodes_l_val)
+
+        values, indexes = self.__unzip_list(nodes_l_val)
+
+        print("nodes: ", values, "indexes: ", indexes)
+
+        # If searching for node's value is None, change it to -1.
+        value = -1 if node.value == None else node.value
+
+        index = self.__find_first_value(values, value)
+
+        print("index: ", index)
+        if index == None:
+            return None
+        print(nodes_l[indexes[index]])
+        print("------------------------------")
+        return nodes_l[indexes[index]]
 
     @staticmethod
-    def __find_first_occurrence(nodes: list[TreeNode], key, lo=0) -> Optional[tuple]:
+    def __unzip_list(zipped_list):
+        """Extract givel list of tuples [(value1, value2), ...] to two lists
+        [value1, ...], [value2, ...]"""
+        first = []
+        second = []
+        for i, j in zipped_list:
+            first.append(i)
+            second.append(j)
+        return first, second
+
+    @staticmethod
+    def __find_first_value(li: list[int], value) -> Optional[int]:
+        """
+        Finds first occurrence of value in given list of values.
+        """
+        lo = 0
+        hi = len(li) - 1
+        print("li: ", li, "val: ", value)
+        while hi > lo:
+            mid = (hi - lo) // 2
+            print(li)
+            print("hi: ", hi, "lo: ", lo, "mid: ", mid)
+            if li[lo + mid] == value:
+                if hi > 2 and li[lo + mid - 1] == value:
+                    hi -= mid
+                else:
+                    lo = lo + mid
+                    hi = lo
+                    break
+            elif li[lo + mid] > value:
+                hi -= mid
+            elif li[lo + mid] < value:
+                lo += mid
+
+        if hi == lo and li[lo] == value:
+            return lo
+        else:
+            return None
+
+    @staticmethod
+    def __find_first_occurrence(nodes: list[TreeNode], key) -> Optional[tuple]:
         """
         Search through sorted list of nodes and find first occurrence of the given key.
+        It's faster than __find_first, because there is no need to map node's keys.
+        Binary search algorithm implementation was used.
 
         Parameters
         ----------
@@ -401,7 +494,7 @@ class TreeMap:
         while hi > lo + 1:
             mid = (hi - lo) // 2
             if nodes[lo + mid].key == key:
-                if nodes[lo + mid - 1].key == key:
+                if hi > 2 and nodes[lo + mid - 1].key == key:
                     hi -= mid
                 else:
                     lo = lo + mid
@@ -418,7 +511,7 @@ class TreeMap:
             return None
 
     @staticmethod
-    def __find_last_occurrence(nodes: list[TreeNode], key, lo=0) -> Optional[tuple]:
+    def __find_last_occurrence(nodes: list[TreeNode], key) -> Optional[tuple]:
         """
         Search through sorted list of nodes and find last occurrence of the given key.
 

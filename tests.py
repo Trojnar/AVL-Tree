@@ -554,6 +554,70 @@ class TestTreeMap(TestCase):
             self.tree_maps["tree_map"].root.right.right.left,
         )
 
+    def test_find_by_node(self):
+        self.tree_maps["tree_map"].display_keys()
+        self.assertEqual(
+            self.tree_maps["tree_map"].find_node(TreeNode(5, None)), TreeNode(5, None)
+        )
+        self.assertEqual(
+            self.tree_maps["tree_map"].find_node(TreeNode(9, None)), TreeNode(9, None)
+        )
+
+        # find blank node
+        self.assertEqual(
+            self.tree_maps["tree_map"].find_node(TreeNode(None, None)), None
+        )
+
+        # Node not found
+        self.assertEqual(self.tree_maps["tree_map"].find_node(TreeNode(3, None)), None)
+
+        # only root tree map
+        self.tree = TreeMap(TreeNode(1, 1))
+        self.assertEqual(self.tree.find_node(TreeNode(1, 1)), TreeNode(1, 1))
+
+        # Wanted node at the end of the tree
+        self.assertEqual(self.tree_maps["tree_map"].find(5)[0], TreeNode(5, None))
+        self.assertIs(
+            self.tree_maps["tree_map"].find_node(TreeNode(5, None)),
+            self.tree_maps["tree_map"].root.right.right.left,
+        )
+
+        # Nodes repeats/ keys repeats
+        self.tree_repeating = TreeMap(TreeNode(1, 1))
+        self.tree_repeating.parse_list(
+            [
+                TreeNode(1, 1),
+                TreeNode(2, None),
+                TreeNode(3, 3),
+                TreeNode(5, 4),
+                TreeNode(2, 2),
+                TreeNode(2, 6),
+                TreeNode(3, 8),
+                TreeNode(3, 8),
+                TreeNode(5, 9),
+                TreeNode(5, None),
+                TreeNode(3, 11),
+                TreeNode(4, 12),
+                TreeNode(2, 13),
+            ]
+        )
+        self.tree_repeating.display_keys()
+        node = self.tree_repeating.find_node(TreeNode(5, 9))
+        self.assertIs(node, self.tree_repeating.root.left.right.left)
+        self.assertEqual(node, TreeNode(5, 9))
+        self.assertEqual(
+            self.tree_repeating.find_node(TreeNode(3, 3)),
+            TreeNode(3, 3),
+        )
+        self.assertEqual(
+            self.tree_repeating.find_node(TreeNode(3, 8)),
+            TreeNode(3, 8),
+        )
+        self.assertEqual(
+            self.tree_repeating.find_node(TreeNode(5, None)),
+            TreeNode(5, None),
+        )
+
     def test_update(self):
         pass
 
