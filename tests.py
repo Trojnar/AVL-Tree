@@ -446,7 +446,7 @@ class TestTreeMap(TestCase):
         self.assertEqual(self.tree_map3.root.left, self.tree_map.root.left)
         self.assertIsNot(self.tree_map3.root.left, self.tree_map.root.left)
 
-        # node already have parent and childs
+        # node already have parent and children
         self.tree_map4 = TreeMap(TreeNode(1, None))
         node = self.tree_maps["balanced_binary_tree_4_levels_height"].root.left
         self.assertIs(
@@ -478,7 +478,7 @@ class TestTreeMap(TestCase):
         self.assertNotEqual(self.tree_map.root.right, self.tree_map.root.right.right)
         self.assertEqual(self.tree_map.root.right.right, None)
 
-        # same key values different parents and childs
+        # same key values different parents and children
         node1 = TreeNode(1, 1)
         node2 = TreeNode(2, 2)
         node3 = TreeNode(3, 3)

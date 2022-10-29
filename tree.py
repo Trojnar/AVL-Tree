@@ -152,7 +152,7 @@ class TreeNode:
         )
 
     def traverse_preorder(self) -> list:
-        # root left rigth
+        # root left right
         if TreeNode.__is_none(self):
             return []
         return (
@@ -264,7 +264,7 @@ class TreeNode:
         else:
             return False
 
-    def is_child_of(self, node: TreeNode) -> Optional[Bool]:
+    def is_child_of(self, node: TreeNode) -> Optional[bool]:
         """
         Method checks if the node is child of given node.
 
@@ -469,7 +469,7 @@ class TreeMap:
 
     @staticmethod
     def __unzip_list(zipped_list):
-        """Extract givel list of tuples [(value1, value2), ...] to two lists
+        """Extract given list of tuples [(value1, value2), ...] to two lists
         [value1, ...], [value2, ...]"""
         first = []
         second = []
