@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import Iterable, Optional, Union
+from xmlrpc.client import Boolean
 
 
 class TreeNode:
@@ -374,7 +375,7 @@ class TreeMap:
         node: TreeNode,
     ) -> Optional[TreeNode]:
         """
-        Finds the same node as given node.
+        Finds the first occurrence of node which has the same key and value.
 
         Parameters
         ----------
@@ -391,9 +392,7 @@ class TreeMap:
             return None
 
         nodes_l = self.find(node.key)
-        print("nodes_l: ", nodes_l)
         nodes_l_val = []
-
         if nodes_l == None:
             return None
 
@@ -406,26 +405,20 @@ class TreeMap:
                 range(len(nodes_l)),
             )
         )
-        print("nodes_l_val: ", nodes_l_val)
 
         # sort list by value. If value is none move it to the end of the list
         nodes_l_val.sort(key=lambda x: x[0])
-        print("sorted nodes_l_val: ", nodes_l_val)
 
         values, indexes = self.__unzip_list(nodes_l_val)
-
-        print("nodes: ", values, "indexes: ", indexes)
 
         # If searching for node's value is None, change it to -1.
         value = -1 if node.value == None else node.value
 
         index = self.__find_first_value(values, value)
 
-        print("index: ", index)
         if index == None:
             return None
-        print(nodes_l[indexes[index]])
-        print("------------------------------")
+
         return nodes_l[indexes[index]]
 
     @staticmethod
@@ -455,9 +448,9 @@ class TreeMap:
                     lo = lo + mid
                     hi = lo
                     break
-            elif li[lo + mid] > value:
+            elif (hi - lo) > 1 and li[lo + mid] > value:
                 hi -= mid
-            elif li[lo + mid] < value:
+            elif (hi - lo) > 1 and li[lo + mid] < value:
                 lo += mid + 1
 
         if hi == lo and li[lo] == value:
@@ -488,7 +481,7 @@ class TreeMap:
         lo = 0
         hi = len(nodes) - 1
 
-        while hi > lo + 1:
+        while hi > lo:
             mid = (hi - lo) // 2
             if nodes[lo + mid].key == key:
                 if hi > 2 and nodes[lo + mid - 1].key == key:
@@ -497,10 +490,12 @@ class TreeMap:
                     lo = lo + mid
                     hi = lo
                     break
-            elif nodes[lo + mid].key > key:
+            elif (hi - lo) > 1 and nodes[lo + mid].key > key:
                 hi -= mid
-            elif nodes[lo + mid].key < key:
-                lo += mid
+            elif (hi - lo) > 1 and nodes[lo + mid].key < key:
+                lo += mid + 1
+            else:
+                break
 
         if hi == lo and nodes[lo].key == key:
             return nodes[lo], lo
@@ -548,18 +543,22 @@ class TreeMap:
         else:
             return None
 
-    def update(self, node1, node2) -> bool:
+    def update(self, node, new_value) -> bool:
         """
-        Updates the node.
+        Updates value of the first occurrence of node with new value.
 
         Parameters
         ----------
-        node1
+        node
             Node to update.
-        node2
+        new_node
             Node to update with.
         """
-        pass
+        node = self.find_node(node)
+        if node == None:
+            return False
+        node.value = new_value
+        return True
 
     def display_keys(self, root=None, level=0):
         """Displays the keys in tree-like form at stdout."""
@@ -679,27 +678,50 @@ class TreeMap:
         """
         return self.root.min_depth()
 
-    def subtrees_eq(self, other):
-        # TODO
+    def __eq__(self, other_node: TreeMap) -> bool:
         """
-        Method checks if subtrees starting from root down are the same.
+        Method checks if TreeMaps are the same.
         """
-        if (type(self) == type(None) and type(other) != type(None)) or (
-            type(self) != type(None) and type(other) == type(None)
-        ):
-            return False
-        elif type(self) == type(None) and type(other) == type(None):
-            return True
-
-        if not isinstance(other, TreeNode):
+        if not isinstance(other_node, TreeMap):
             return NotImplemented
 
-        return (
-            self.key == other.key
-            and self.value == other.value
-            and self.left == other.left
-            and self.right == other.right
-        )
+        return TreeMap.subtrees_eq(self.root, other_node.root)
+
+    @staticmethod
+    def subtrees_eq(root: Optional[TreeNode], other: Optional[TreeNode]) -> bool:
+        """
+        Method checks if subtrees starting from the root down are the same.
+
+        Parameters
+        ----------
+        root : Optional[TreeNode]
+            Root of the subtree to check.
+        other : Optional[TreeNode]
+            Root of the subtree to compare with.
+
+        Returns
+        -------
+        bool
+            returns True if subtrees are the same, otherwise returns False.
+
+        """
+        # Handling Nones
+        if (type(root) == type(None) and type(other) != type(None)) or (
+            type(root) != type(None) and type(other) == type(None)
+        ):
+            return False
+        elif type(root) == type(None) and type(other) == type(None):
+            return True
+        elif root != other:
+            return False
+
+        left = TreeMap.subtrees_eq(root.left, other.left)  # type: ignore
+        right = TreeMap.subtrees_eq(root.right, other.right)  # type: ignore
+
+        if left and right:
+            return True
+        else:
+            return False
 
     def is_child(self, child, other):
         # TODO

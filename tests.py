@@ -555,7 +555,6 @@ class TestTreeMap(TestCase):
         )
 
     def test_find_by_node(self):
-        self.tree_maps["tree_map"].display_keys()
         self.assertEqual(
             self.tree_maps["tree_map"].find_node(TreeNode(5, None)), TreeNode(5, None)
         )
@@ -601,7 +600,6 @@ class TestTreeMap(TestCase):
                 TreeNode(2, 13),
             ]
         )
-        self.tree_repeating.display_keys()
         node = self.tree_repeating.find_node(TreeNode(5, 9))
         self.assertIs(node, self.tree_repeating.root.left.right.left)
         self.assertEqual(node, TreeNode(5, 9))
@@ -628,8 +626,33 @@ class TestTreeMap(TestCase):
         )
         self.assertIs(node, self.tree_repeating.root.left.right.right)
 
+        self.assertEqual(
+            self.tree_maps["tree_map"].find_node(TreeNode(1, None)), TreeNode(1, None)
+        )
+
     def test_update(self):
-        pass
+        self.tree_maps["tree_map"].update(TreeNode(9, None), 5)
+        self.assertEqual(self.tree_maps["tree_map"].root.right.value, 5)
+
+        self.tree_maps["tree_map"].update(TreeNode(1, None), 5)
+        self.assertEqual(self.tree_maps["tree_map"].root.value, 5)
+
+    def test_subtrees_eq_and_magic_eq(self):
+        tree_map = TreeMap(TreeNode(1, 1))
+        tree_map2 = TreeMap(TreeNode(1, 1))
+        result = tree_map.subtrees_eq(tree_map.root, tree_map2.root)
+        self.assertTrue(result)
+        self.assertTrue(tree_map == tree_map2)
+        tree_map.insert(3, 8)
+        tree_map2.insert(3, 8)
+        result = tree_map.subtrees_eq(tree_map.root, tree_map2.root)
+        self.assertTrue(result)
+        self.assertTrue(tree_map == tree_map2)
+        tree_map.insert(5, 10)
+        tree_map2.insert(3, 2)
+        result = tree_map.subtrees_eq(tree_map.root, tree_map2.root)
+        self.assertFalse(result)
+        self.assertFalse(tree_map == tree_map2)
 
     ### TreeNode methods ###
     def test_is_free(self):
