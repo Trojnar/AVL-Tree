@@ -669,6 +669,29 @@ class TestTreeMap(TestCase):
         self.assertFalse(node2.is_child_of(TreeNode(1, None)))
         self.assertFalse(node1.is_child_of(None))
 
+    def test_is_full(self):
+        self.tree_maps["tree_map"].display_keys()
+        self.assertTrue(
+            self.tree_maps["tree_map"].is_full(self.tree_maps["tree_map"].root, 0)
+        )
+        self.assertTrue(
+            self.tree_maps["tree_map"].is_full(self.tree_maps["tree_map"].root, 1)
+        )
+        self.assertFalse(
+            self.tree_maps["tree_map"].is_full(self.tree_maps["tree_map"].root, 3)
+        )
+        self.assertFalse(
+            self.tree_maps["tree_map"].is_full(self.tree_maps["tree_map"].root, 4)
+        )
+
+    def test_is_max_left(self):
+        self.tree_maps["tree_map_last_blank"].display_keys()
+        self.assertTrue(self.tree_maps["tree_map_last_blank"].is_max_left())
+        self.assertFalse(self.tree_maps["tree_map"].is_max_left())
+    
+    def test_is_complete(self):
+        pass
+
     ### TreeNode methods ###
     def test_is_free(self):
         free_node = TreeNode(1, 1)

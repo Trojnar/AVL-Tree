@@ -1,6 +1,5 @@
 from __future__ import annotations
 from typing import Iterable, Optional, Union
-from xmlrpc.client import Boolean
 
 
 class TreeNode:
@@ -686,6 +685,34 @@ class TreeMap:
         """
         return self.root.traverse_inorder()
 
+    @staticmethod
+    def __is_full(root, last_level, level=0) -> Optional[bool]:
+        """
+        Returns True if there is full in the levels before the last_level inclusive.
+        """
+        if root == None or root.key == None:
+            return False
+
+        if level == last_level - 1:
+            return True
+
+        left = TreeMap.__is_full(root.left, last_level, level + 1)
+        right = TreeMap.__is_full(root.right, last_level, level + 1)
+        if left and right:
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def is_full(root: TreeNode, last_level) -> Optional[bool]:
+        if isinstance(root, TreeNode):
+            if last_level == 0:
+                return True
+            else:
+                return TreeMap.__is_full(root, last_level)
+        else:
+            raise TypeError("Passed parameter 'root' have to be of the type TreeNode.")
+
     def is_complete(self) -> bool:
         """
         Checks if tree is complete
@@ -695,7 +722,35 @@ class TreeMap:
         boolean
             True if tree is complete, False if not
         """
-        return True
+        if TreeMap.is_full(self.root, self.root.height()) and self.is_max_left():
+            return True
+        # every level before the last is full
+        # every node at lowest level is as far left as possible
+
+    @staticmethod
+    def __is_max_left(root, height, level=0) -> bool:
+        # True True and True False == True
+        # TODO: some static methods - like this one for example should be in class
+        # TreeNode. and here should be method that uses that method for
+        # attribute height and root of TreeMap.
+        print("LEVEL ", level, "height: ", height)
+        if root == None or root.key == None:
+            return False
+
+        if level == height - 1:
+            return True
+
+        left = TreeMap.__is_max_left(root.left, height, level + 1)
+        right = TreeMap.__is_max_left(root.right, height, level + 1)
+
+        print("root: ", root, "left: ", left, "right: ", right)
+        if (left and right) or (left and not right):
+            return True
+        else:
+            return False
+
+    def is_max_left(self):
+        return TreeMap.__is_max_left(self.root, self.height())
 
     def height(self) -> int:
         """
@@ -704,6 +759,7 @@ class TreeMap:
         int
             Height/depth of the tree.
         """
+        # TODO create attribute height, length and min depth
         return self.root.height()
 
     def length(self) -> int:
