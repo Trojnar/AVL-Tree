@@ -237,6 +237,52 @@ class TreeNode:
             return False
         return True
 
+    def is_parent_of(self, node: TreeNode) -> Optional[bool]:
+        """
+        Method checks if the node is parent of given node.
+
+        Parameters
+        ----------
+        node
+            Node to check if it is a child.
+
+        Returns
+        -------
+        bool
+            True if the node is parent of given node.
+        """
+        if self is node:
+            return True
+        elif TreeNode.__is_none(self.left) and TreeNode.__is_none(self.right):
+            return
+
+        left = TreeNode.is_parent_of(self.left, node)  # type: ignore
+        right = TreeNode.is_parent_of(self.right, node)  # type: ignore
+
+        if left or right:
+            return True
+        else:
+            return False
+
+    def is_child_of(self, node: TreeNode) -> Optional[Bool]:
+        """
+        Method checks if the node is child of given node.
+
+        Parameters
+        ----------
+        node
+            Node to check if it is a child.
+
+        Returns
+        -------
+        bool
+            True if the node is parent of given node.
+        """
+        if node is None:
+            return False
+
+        return node.is_parent_of(self)
+
 
 class TreeMap:
     """
@@ -722,23 +768,6 @@ class TreeMap:
             return True
         else:
             return False
-
-    def is_child(self, child, other):
-        # TODO
-        """
-        Method checks node is child of other node.
-        """
-        if (type(self) == type(None) and type(other) != type(None)) or (
-            type(self) != type(None) and type(other) == type(None)
-        ):
-            return False
-        elif type(self) == type(None) and type(other) == type(None):
-            return True
-
-        if not isinstance(other, TreeNode):
-            return NotImplemented
-
-        return self.key == other.key and self.value == other.value and self.parent
 
     def __repr__(self) -> str:
         return str(self.to_tuple())

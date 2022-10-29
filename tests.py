@@ -654,6 +654,21 @@ class TestTreeMap(TestCase):
         self.assertFalse(result)
         self.assertFalse(tree_map == tree_map2)
 
+    def test_is_parent_of(self):
+        node1 = self.tree_maps["tree_map"].root
+        node2 = self.tree_maps["tree_map"].root.left.left
+        self.assertTrue(node1.is_parent_of(node2))
+        self.assertFalse(node1.is_parent_of(TreeNode(1, None)))
+        self.assertFalse(node1.is_parent_of(None))
+
+    def test_is_child_of(self):
+        node1 = self.tree_maps["tree_map"].root
+        node2 = self.tree_maps["tree_map"].root.left.left
+        self.assertTrue(node2.is_child_of(node1))
+        self.assertFalse(node1.is_child_of(TreeNode(1, None)))
+        self.assertFalse(node2.is_child_of(TreeNode(1, None)))
+        self.assertFalse(node1.is_child_of(None))
+
     ### TreeNode methods ###
     def test_is_free(self):
         free_node = TreeNode(1, 1)
