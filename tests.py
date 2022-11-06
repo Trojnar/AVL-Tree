@@ -2,8 +2,8 @@
 
 from unittest import TestCase
 import unittest
-from tree import TreeMap
-from tree import TreeNode
+from tree import TreeMap, TreeNode
+from bst import BSTMap, BSTNode
 
 
 class TestTreeMap(TestCase):
@@ -670,7 +670,6 @@ class TestTreeMap(TestCase):
         self.assertFalse(node1.is_child_of(None))
 
     def test_is_full(self):
-        self.tree_maps["tree_map"].display_keys()
         self.assertTrue(
             self.tree_maps["tree_map"].is_full(self.tree_maps["tree_map"].root, 0)
         )
@@ -685,10 +684,9 @@ class TestTreeMap(TestCase):
         )
 
     def test_is_max_left(self):
-        self.tree_maps["tree_map_last_blank"].display_keys()
         self.assertTrue(self.tree_maps["tree_map_last_blank"].is_max_left())
         self.assertFalse(self.tree_maps["tree_map"].is_max_left())
-    
+
     def test_is_complete(self):
         pass
 
@@ -702,6 +700,58 @@ class TestTreeMap(TestCase):
         bounded_node.insert(bounded_node2)
         self.assertEqual(bounded_node.is_free(), False)
         self.assertEqual(bounded_node2.is_free(), False)
+
+
+class BSTTest(TestCase):
+    def setUp(self):
+        test_cases = [
+            # 0
+            (
+                (
+                    ((None, 4, None), 10, (None, 12, None)),
+                    15,
+                    ((None, 18, None), 22, (None, 24, None)),
+                ),
+                25,
+                (
+                    ((None, 31, None), 25, (None, 44, None)),
+                    50,
+                    ((None, 66, None), 70, (None, 90, None)),
+                ),
+            ),
+            # 1
+            (
+                ((None, 4, None), 2, (None, 5, None)),
+                1,
+                ((None, 6, None), 3, (None, 7, None)),
+            ),
+        ]
+        self._set_treemaps(test_cases)
+
+    def _set_treemaps(self, test_cases):
+        self.tree_maps = {
+            "first_tree": BSTMap.parse_tuple(test_cases[0]),
+            "second_tree": BSTMap.parse_tuple(test_cases[1]),
+        }
+
+    def test_insert(self):
+        print(type(self.tree_maps["first_tree"]))
+        self.tree_maps["first_tree"].insert(5, None)
+        self.assertEqual(self.tree_maps["first_tree"].root.left.left.left.right.key, 5)
+        self.tree_maps["first_tree"].insert(3, None)
+        self.assertEqual(self.tree_maps["first_tree"].root.left.left.left.left.key, 3)
+        self.tree_maps["first_tree"].insert(120, None)
+        self.assertEqual(
+            self.tree_maps["first_tree"].root.right.right.right.right.key, 120
+        )
+        len_bef = self.tree_maps["first_tree"].length()
+        self.tree_maps["first_tree"].insert(15, None)
+        self.assertEqual(len_bef, self.tree_maps["first_tree"].length())
+
+    def test_find(self):
+        node = self.tree_maps["first_tree"].find(15)
+        self.assertIsInstance(node, BSTNode)
+        self.assertIs(self.tree_maps["first_tree"].root.left, node)
 
 
 if __name__ == "__main__":

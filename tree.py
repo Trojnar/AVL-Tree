@@ -72,7 +72,7 @@ class TreeNode:
         return str(self.key)
 
     @staticmethod
-    def __is_none(object):
+    def _is_none(object):
         # Leaf's left/right element can be None or TreeNode(None, None)
         # this helper method identify if self is blank element or not.
         if object is None or (isinstance(object, TreeNode) and object.key == None):
@@ -80,9 +80,9 @@ class TreeNode:
         return False
 
     @staticmethod
-    def __is_leaf(object):
-        # Return True if node is leaf.
-        if TreeNode.__is_none(object.left) and TreeNode.__is_none(object.right):
+    def _is_leaf(object):
+        # Return True if node is a leaf.
+        if TreeNode._is_none(object.left) and TreeNode._is_none(object.right):
             return True
         return False
 
@@ -93,7 +93,7 @@ class TreeNode:
         tuple
             Tuple of keys in (left-subtree, key, right-subtree) order.
         """
-        if TreeNode.__is_none(self):
+        if TreeNode._is_none(self):
             return None  # type: ignore
 
         return (
@@ -103,7 +103,7 @@ class TreeNode:
         )
 
     def height(self):
-        if TreeNode.__is_none(self):
+        if TreeNode._is_none(self):
             return 0
 
         return 1 + max(
@@ -111,11 +111,11 @@ class TreeNode:
         )
 
     def display_keys(self, level=0):
-        if TreeNode.__is_none(self):
+        if TreeNode._is_none(self):
             print(level * "\t", "Ø")
             return
 
-        if TreeNode.__is_leaf(self):
+        if TreeNode._is_leaf(self):
             print(level * "\t", self.key)
             return
 
@@ -124,7 +124,7 @@ class TreeNode:
         TreeNode.display_keys(self.left, level + 1)  # type: ignore
 
     def length(self):
-        if TreeNode.__is_none(self):
+        if TreeNode._is_none(self):
             return 0
 
         return (
@@ -132,7 +132,7 @@ class TreeNode:
         )
 
     def min_depth(self):
-        if TreeNode.__is_none(self):
+        if TreeNode._is_none(self):
             return 0
 
         return 1 + min(
@@ -141,7 +141,7 @@ class TreeNode:
 
     def traverse_inorder(self) -> list:
         # left root right
-        if TreeNode.__is_none(self):
+        if TreeNode._is_none(self):
             return []
 
         return (
@@ -152,7 +152,7 @@ class TreeNode:
 
     def traverse_preorder(self) -> list:
         # root left right
-        if TreeNode.__is_none(self):
+        if TreeNode._is_none(self):
             return []
         return (
             [self]
@@ -162,7 +162,7 @@ class TreeNode:
 
     def traverse_postorder(self) -> list:
         # right left root
-        if TreeNode.__is_none(self):
+        if TreeNode._is_none(self):
             return []
 
         return (
@@ -172,7 +172,7 @@ class TreeNode:
         )
 
     def insert(self, node):
-        if TreeNode.__is_none(self):
+        if TreeNode._is_none(self):
             # If root is blank node - replace instance attributes and return.
             self.__dict__ = node.__dict__
             return
@@ -182,12 +182,12 @@ class TreeNode:
         if depth > min_depth:
             # Don't look deeper than level where blank spot is.
             return False
-        elif TreeNode.__is_none(self.left) and not inserted:
+        elif TreeNode._is_none(self.left) and not inserted:
             # If first blank spot from the left at left branch found - insert node:
             self.left = node
             self.left.parent = self
             return True
-        elif TreeNode.__is_none(self.right) and not inserted:
+        elif TreeNode._is_none(self.right) and not inserted:
             # If first blank spot from the left at right branch found - insert node:
             self.right = node
             self.right.parent = self
@@ -252,7 +252,7 @@ class TreeNode:
         """
         if self is node:
             return True
-        elif TreeNode.__is_none(self.left) and TreeNode.__is_none(self.right):
+        elif TreeNode._is_none(self.left) and TreeNode._is_none(self.right):
             return
 
         left = TreeNode.is_parent_of(self.left, node)  # type: ignore
@@ -317,14 +317,20 @@ class TreeMap:
         Checks if tree is complete.
     height() -> int
         Returns tree height.
-    len() -> int
+    length() -> int
         Returns tree length.
 
 
     """
 
+    node_class = TreeNode
+
     def __init__(self, root: TreeNode):
-        self.root = root
+        if isinstance(root, TreeNode):
+            self.root = root
+        else:
+            raise ValueError("Root should be TreeNode instance.")
+        self.node_class = TreeNode
 
     def insert(self, key, value):
         """
@@ -637,16 +643,16 @@ class TreeMap:
 
         return cls(cls.__create_tree_from_tuple(tree_t))
 
-    @staticmethod
-    def __create_tree_from_tuple(tree_t: tuple):
+    @classmethod
+    def __create_tree_from_tuple(cls, tree_t: tuple):
         """Creates tree from tuple of keys and returns root node."""
         if tree_t is None:
             # TODO : Make Nones at the end of the tree not TreeNode(None, None)
-            return TreeNode(None, None)
-        tree_node = TreeNode(tree_t[1], None)
-        tree_node.left = TreeMap.__create_tree_from_tuple(tree_t[0])
+            return cls.node_class(None, None)
+        tree_node = cls.node_class(tree_t[1], None)
+        tree_node.left = cls.__create_tree_from_tuple(tree_t[0])
         tree_node.left.parent = tree_node
-        tree_node.right = TreeMap.__create_tree_from_tuple(tree_t[2])
+        tree_node.right = cls.__create_tree_from_tuple(tree_t[2])
         tree_node.right.parent = tree_node
         return tree_node
 
@@ -733,7 +739,6 @@ class TreeMap:
         # TODO: some static methods - like this one for example should be in class
         # TreeNode. and here should be method that uses that method for
         # attribute height and root of TreeMap.
-        print("LEVEL ", level, "height: ", height)
         if root == None or root.key == None:
             return False
 
@@ -743,7 +748,6 @@ class TreeMap:
         left = TreeMap.__is_max_left(root.left, height, level + 1)
         right = TreeMap.__is_max_left(root.right, height, level + 1)
 
-        print("root: ", root, "left: ", left, "right: ", right)
         if (left and right) or (left and not right):
             return True
         else:
