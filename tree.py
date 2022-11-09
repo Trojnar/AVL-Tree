@@ -103,6 +103,8 @@ class TreeNode:
         )
 
     def height(self):
+        # BUG: Counting of height should start from 0, so for now real height is
+        # self.height()-1
         if TreeNode._is_none(self):
             return 0
 
@@ -281,6 +283,35 @@ class TreeNode:
             return False
 
         return node.is_parent_of(self)
+
+    def _find_rightmost(self, max_depth, level=0, leaf=None):
+        # TODO
+        print(
+            "key: ",
+            self.key,
+            "max_depth: ",
+            max_depth,
+            "level: ",
+            level,
+            "leaf: ",
+            leaf,
+        )
+        if TreeNode._is_leaf(self) and level == max_depth:
+            return self
+        elif TreeNode._is_leaf(self):
+            return
+
+        if leaf is None and not TreeNode._is_none(self.right):
+            leaf = TreeNode._find_rightmost(self.right, max_depth, level + 1, leaf)
+        elif leaf is None and not TreeNode._is_none(self.left):
+            leaf = TreeNode._find_rightmost(self.left, max_depth, level + 1, leaf)
+
+        if leaf is not None:
+            return leaf
+
+    def remove(self):
+        # TODO
+        pass
 
 
 class TreeMap:
@@ -471,6 +502,11 @@ class TreeMap:
             return None
 
         return nodes_l[indexes[index]]
+
+    def remove(self, n: TreeNode):
+        """Removes first node that have exact same key and value."""
+        # Find deepest rightmost node and replace it with the node to delete.
+        pass
 
     @staticmethod
     def __unzip_list(zipped_list):
@@ -831,3 +867,6 @@ class TreeMap:
 
     def __repr__(self) -> str:
         return str(self.to_tuple())
+
+    def remove(self):
+        pass

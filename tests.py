@@ -4,6 +4,7 @@ from unittest import TestCase
 import unittest
 from tree import TreeMap, TreeNode
 from bst import BSTMap, BSTNode
+from rbt import RBTMap, RBTNode
 
 
 class TestTreeMap(TestCase):
@@ -701,10 +702,24 @@ class TestTreeMap(TestCase):
         self.assertEqual(bounded_node.is_free(), False)
         self.assertEqual(bounded_node2.is_free(), False)
 
+    def test_find_rightmost(self):
+        self.assertEqual(
+            self.tree_maps["tree_map"]
+            .root._find_rightmost(self.tree_maps["tree_map"].height() - 1)
+            .key,
+            5,
+        )
+
+    def test_remove(self):
+        #TODO
+        # find rightmost
+        # replace with node to delete
+        # remove rightmost
+
 
 class BSTTest(TestCase):
     def setUp(self):
-        test_cases = [
+        self.test_cases = [
             # 0
             (
                 (
@@ -725,17 +740,21 @@ class BSTTest(TestCase):
                 1,
                 ((None, 6, None), 3, (None, 7, None)),
             ),
+            # 2
+            (
+                ((None, 2, None), 7, (None, 6, None)),
+                1,
+                (None, 9, ((None, 5, None), 9, None)),
+            ),
         ]
-        self._set_treemaps(test_cases)
+        self._set_treemaps()
 
-    def _set_treemaps(self, test_cases):
+    def _set_treemaps(self):
         self.tree_maps = {
-            "first_tree": BSTMap.parse_tuple(test_cases[0]),
-            "second_tree": BSTMap.parse_tuple(test_cases[1]),
+            "first_tree": BSTMap.parse_tuple(self.test_cases[0]),
         }
 
     def test_insert(self):
-        print(type(self.tree_maps["first_tree"]))
         self.tree_maps["first_tree"].insert(5, None)
         self.assertEqual(self.tree_maps["first_tree"].root.left.left.left.right.key, 5)
         self.tree_maps["first_tree"].insert(3, None)
@@ -752,6 +771,72 @@ class BSTTest(TestCase):
         node = self.tree_maps["first_tree"].find(15)
         self.assertIsInstance(node, BSTNode)
         self.assertIs(self.tree_maps["first_tree"].root.left, node)
+
+    def test_is_bst(self):
+        self.assertTrue(self.tree_maps["first_tree"].is_bst())
+
+    def test_parse_tuple(self):
+        not_bst = self.test_cases[1]
+        not_balanced_bst_with_duplicate = self.test_cases[2]
+        with self.assertRaises(ValueError):
+            BSTMap.parse_tuple(not_bst),
+        with self.assertRaises(ValueError):
+            BSTMap.parse_tuple(not_balanced_bst_with_duplicate),
+        self.assertNotEqual(self.tree_maps["first_tree"], False)
+        self.assertIsInstance(self.tree_maps["first_tree"], BSTMap)
+
+    def test_parse_list(self):
+        l = [
+            BSTNode(5, None),
+            BSTNode(8, None),
+            BSTNode(10, None),
+            BSTNode(11, None),
+            BSTNode(12, "Some Value"),
+            BSTNode(4, None),
+            BSTNode(14, None),
+        ]
+        tree = BSTMap.parse_list(l)
+        self.assertEqual(tree.root.key, 5)
+        self.assertEqual(tree.root.left.key, 4)
+        self.assertEqual(tree.root.right.key, 8)
+        self.assertEqual(tree.root.right.right.key, 10)
+        self.assertEqual(tree.root.right.right.right.key, 11)
+        self.assertEqual(tree.root.right.right.right.right.key, 12)
+        self.assertEqual(tree.root.right.right.right.right.right.key, 14)
+
+        l2 = [
+            (5, None),
+            (8, None),
+            (10, None),
+            (11, None),
+            (12, "Some Value"),
+            (4, None),
+            (14, None),
+        ]
+        tree2 = BSTMap.parse_list(l2)
+
+        l3 = [
+            [5, None],
+            [8, None],
+            [10, None],
+            [11, None],
+            [12, "Some Value"],
+            [4, None],
+            [14, None],
+        ]
+        tree3 = BSTMap.parse_list(l3)
+
+        # Every tree is the same
+        self.assertEqual(tree, tree2)
+        self.assertTrue(tree2, tree3)
+
+
+class RBTTest(TestCase):
+    def test_setter(self):
+        node = RBTNode(1, None, "Red")
+        print(repr(node))
+        node.color = "black"
+        print(repr(node))
 
 
 if __name__ == "__main__":
