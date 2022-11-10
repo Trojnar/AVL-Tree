@@ -106,7 +106,7 @@ class TreeNode:
         # BUG: Counting of height should start from 0, so for now real height is
         # self.height()-1
         if TreeNode._is_none(self):
-            return 0
+            return -1
 
         return 1 + max(
             TreeNode.height(self.left), TreeNode.height(self.right)  # type: ignore
@@ -285,17 +285,6 @@ class TreeNode:
         return node.is_parent_of(self)
 
     def _find_rightmost(self, max_depth, level=0, leaf=None):
-        # TODO
-        print(
-            "key: ",
-            self.key,
-            "max_depth: ",
-            max_depth,
-            "level: ",
-            level,
-            "leaf: ",
-            leaf,
-        )
         if TreeNode._is_leaf(self) and level == max_depth:
             return self
         elif TreeNode._is_leaf(self):
@@ -303,15 +292,32 @@ class TreeNode:
 
         if leaf is None and not TreeNode._is_none(self.right):
             leaf = TreeNode._find_rightmost(self.right, max_depth, level + 1, leaf)
-        elif leaf is None and not TreeNode._is_none(self.left):
+        if leaf is None and not TreeNode._is_none(self.left):
             leaf = TreeNode._find_rightmost(self.left, max_depth, level + 1, leaf)
 
         if leaf is not None:
             return leaf
 
-    def remove(self):
-        # TODO
-        pass
+    def _remove(self, rightmost):
+
+        assert rightmost is not None
+        assert not self._is_none(rightmost.parent)
+
+        if rightmost.parent.left == rightmost:
+            rightmost.parent.left = TreeNode(None, None)
+        elif rightmost.parent.right == rightmost:
+            rightmost.parent.right = TreeNode(None, None)
+
+        rightmost.parent = (
+            self.parent if self.parent is not None else TreeNode(None, None)
+        )
+        rightmost.left = self.left
+        rightmost.right = self.right
+        self.__dict__ = rightmost.__dict__
+
+    def remove(self, node):
+        rightmost = self._find_rightmost(max_depth=self.height())
+        TreeNode._remove(node, rightmost)
 
 
 class TreeMap:
@@ -503,10 +509,12 @@ class TreeMap:
 
         return nodes_l[indexes[index]]
 
-    def remove(self, n: TreeNode):
+    def remove(self, node: TreeNode):
         """Removes first node that have exact same key and value."""
-        # Find deepest rightmost node and replace it with the node to delete.
-        pass
+        # Finds deepest rightmost node and replace it with the node to delete.
+        n = self.find_node(node)
+        if node is not None:
+            self.root.remove(n)
 
     @staticmethod
     def __unzip_list(zipped_list):
@@ -778,7 +786,7 @@ class TreeMap:
         if root == None or root.key == None:
             return False
 
-        if level == height - 1:
+        if level == height:
             return True
 
         left = TreeMap.__is_max_left(root.left, height, level + 1)
@@ -867,6 +875,3 @@ class TreeMap:
 
     def __repr__(self) -> str:
         return str(self.to_tuple())
-
-    def remove(self):
-        pass

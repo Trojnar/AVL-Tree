@@ -212,9 +212,9 @@ class TestTreeMap(TestCase):
         )
 
     def test_height_method(self):
-        self.assertEqual(self.tree_maps["tree_map"].height(), 4)
-        self.assertEqual(self.tree_maps["only_right_tree_map"].height(), 4)
-        self.assertEqual(self.tree_maps["only_left_tree_map"].height(), 4)
+        self.assertEqual(self.tree_maps["tree_map"].height(), 3)
+        self.assertEqual(self.tree_maps["only_right_tree_map"].height(), 3)
+        self.assertEqual(self.tree_maps["only_left_tree_map"].height(), 3)
 
     def test_length_method(self):
         self.assertEqual(self.tree_maps["tree_map"].length(), 7)
@@ -705,16 +705,37 @@ class TestTreeMap(TestCase):
     def test_find_rightmost(self):
         self.assertEqual(
             self.tree_maps["tree_map"]
-            .root._find_rightmost(self.tree_maps["tree_map"].height() - 1)
+            .root._find_rightmost(self.tree_maps["tree_map"].height())
             .key,
             5,
         )
 
     def test_remove(self):
-        #TODO
-        # find rightmost
-        # replace with node to delete
-        # remove rightmost
+        self.assertEqual(
+            self.tree_maps["tree_map"].root.right.right.left, TreeNode(5, None)
+        )
+        self.assertEqual(self.tree_maps["tree_map"].root.left, TreeNode(7, None))
+        self.tree_maps["tree_map"].remove(TreeNode(7, None))
+        self.assertEqual(
+            self.tree_maps["tree_map"].root.right.right.left, TreeNode(None, None)
+        )
+        self.assertEqual(self.tree_maps["tree_map"].root.left, TreeNode(5, None))
+
+        # delete root
+        self.assertEqual(self.tree_maps["tree_map"].root.right.right, TreeNode(9, None))
+        self.assertEqual(self.tree_maps["tree_map"].root, TreeNode(1, None))
+        self.tree_maps["tree_map"].remove(TreeNode(1, None))
+        self.assertEqual(self.tree_maps["tree_map"].root, TreeNode(9, None))
+        self.assertEqual(
+            self.tree_maps["tree_map"].root.right.right, TreeNode(None, None)
+        )
+
+        # delete rightmost
+        self.assertEqual(self.tree_maps["tree_map"].root.left.right, TreeNode(6, None))
+        self.tree_maps["tree_map"].remove(TreeNode(6, None))
+        self.assertEqual(
+            self.tree_maps["tree_map"].root.left.right, TreeNode(None, None)
+        )
 
 
 class BSTTest(TestCase):
