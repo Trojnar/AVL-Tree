@@ -152,6 +152,34 @@ class TreeNode:
             + TreeNode.traverse_inorder(self.right)  # type: ignore
         )
 
+    def max_left(self):
+        if TreeNode._is_none(self.left):
+            return self
+
+        return TreeNode.max_left(self.left)
+
+    def max_right(self):
+        if TreeNode._is_none(self.right):
+            return self
+
+        return TreeNode.max_right(self.right)
+
+    def inorder_successor(self, f_next=False):
+        # Inorder successor will be first node to return when traverse right subtree
+        # (max left of the right subtree or right itself).
+        if not TreeNode._is_none(self.right):
+            return self.right.max_left()
+
+    def inorder_predecessor(self):
+        # Inorder predecessor will be last node if traverse left subtree.
+        # (max right of the left subtree or left itself).
+        if not TreeNode._is_none(self.left):
+            return self.left.max_right()
+        elif not TreeNode._is_none(self.parent):
+            return self.parent
+        else:
+            return None
+
     def traverse_preorder(self) -> list:
         # root left right
         if TreeNode._is_none(self):

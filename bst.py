@@ -80,7 +80,23 @@ class BSTMap(TreeMap):
 
     def remove(self, key):
         """Removes node of given key."""
-        pass
+        node = self.find(key)
+        assert node is not None  # and node.parent is not None
+
+        if BSTNode._is_leaf(node):
+            # If node is leaf simply delete node
+            if node.parent.left == node:
+                node.parent.left = TreeNode(None, None)
+            elif node.parent.right == node:
+                node.parent.right = TreeNode(None, None)
+        elif BSTNode._is_none(node.left) != BSTNode._is_none(node.right):  # XOR
+            # If node has one child swap the node with the child
+            child = node.left if not BSTNode._is_none(node.left) else node.right
+            child.parent = node.parent
+            node.__dict__ = child.__dict__
+        else:
+            # If node has two children.
+            print(node.traverse_inorder())
 
     def is_bst(self):
         return self.root.is_bst()

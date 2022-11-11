@@ -737,6 +737,20 @@ class TestTreeMap(TestCase):
             self.tree_maps["tree_map"].root.left.right, TreeNode(None, None)
         )
 
+    def test_inorder_successor(self):
+        tree = self.tree_maps["tree_map"]
+        tree.display_keys()
+        self.assertEqual(tree.root.inorder_successor().key, 9)
+        self.assertEqual(tree.root.left.inorder_successor().key, 6)
+        self.assertEqual(tree.root.right.inorder_successor().key, 5)
+
+    def test_inorder_predecessor(self):
+        tree = self.tree_maps["tree_map"]
+        tree.display_keys()
+        self.assertEqual(tree.root.inorder_predecessor().key, 6)
+        self.assertEqual(tree.root.left.inorder_predecessor().key, 2)
+        self.assertEqual(tree.root.right.inorder_predecessor().key, 1)
+
 
 class BSTTest(TestCase):
     def setUp(self):
@@ -850,6 +864,24 @@ class BSTTest(TestCase):
         # Every tree is the same
         self.assertEqual(tree, tree2)
         self.assertTrue(tree2, tree3)
+
+    def test_remove(self):
+        tree = self.tree_maps["first_tree"]
+
+        # remove leaf
+        self.assertEqual(tree.root.left.left.left, BSTNode(4, None))
+        self.tree_maps["first_tree"].remove(4)
+        self.assertEqual(tree.root.left.left.left, BSTNode(None, None))
+
+        # remove node with one child
+        self.assertEqual(tree.root.left.left, BSTNode(10, None))
+        self.tree_maps["first_tree"].display_keys()
+        self.tree_maps["first_tree"].remove(10)
+        self.tree_maps["first_tree"].display_keys()
+        self.assertEqual(tree.root.left.left, BSTNode(12, None))
+
+        # remove node with two children
+        self.tree_maps["first_tree"].remove(15)
 
 
 class RBTTest(TestCase):
