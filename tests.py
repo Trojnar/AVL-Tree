@@ -875,13 +875,23 @@ class BSTTest(TestCase):
 
         # remove node with one child
         self.assertEqual(tree.root.left.left, BSTNode(10, None))
-        self.tree_maps["first_tree"].display_keys()
         self.tree_maps["first_tree"].remove(10)
-        self.tree_maps["first_tree"].display_keys()
         self.assertEqual(tree.root.left.left, BSTNode(12, None))
+        self.assertEqual(tree.root.left.left.right, BSTNode(None, None))
 
         # remove node with two children
+        self.assertEqual(tree.root.left, BSTNode(15, None))
+        self.assertEqual(tree.root.left.right.left, BSTNode(18, None))
         self.tree_maps["first_tree"].remove(15)
+        self.assertEqual(tree.root.left, BSTNode(18, None))
+        self.assertEqual(tree.root.left.right.left, BSTNode(None, None))
+
+        # remove root
+        self.assertEqual(tree.root, BSTNode(25, None))
+        self.assertEqual(tree.root.right.left.left, BSTNode(31, None))
+        self.tree_maps["first_tree"].remove(25)
+        self.assertEqual(tree.root, BSTNode(31, None))
+        self.assertEqual(tree.root.right.left.left, BSTNode(None, None))
 
 
 class RBTTest(TestCase):

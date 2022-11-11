@@ -1,4 +1,5 @@
 from __future__ import annotations
+from copy import copy
 from typing import Union
 from tree import TreeNode, TreeMap
 
@@ -78,25 +79,29 @@ class BSTMap(TreeMap):
     def insert_node(self, node: BSTNode):
         self.root.insert(node.key, node.value)
 
-    def remove(self, key):
+    def remove(self, key, node=None):
         """Removes node of given key."""
-        node = self.find(key)
+        if node == None:
+            node = self.find(key)
         assert node is not None  # and node.parent is not None
 
         if BSTNode._is_leaf(node):
-            # If node is leaf simply delete node
+            # If the node is a leaf simply delete the node
             if node.parent.left == node:
                 node.parent.left = TreeNode(None, None)
             elif node.parent.right == node:
                 node.parent.right = TreeNode(None, None)
         elif BSTNode._is_none(node.left) != BSTNode._is_none(node.right):  # XOR
-            # If node has one child swap the node with the child
+            # If the node has one child swap the node with the child
             child = node.left if not BSTNode._is_none(node.left) else node.right
-            child.parent = node.parent
-            node.__dict__ = child.__dict__
+            node.swap_nodes(child)
+            self.remove(key, child)
         else:
-            # If node has two children.
-            print(node.traverse_inorder())
+            # If the node has two children find it's successor then copy the successor
+            # in the place of the node and delete the successor.
+            successor = node.inorder_successor()
+            node.swap_nodes(successor)
+            self.remove(key, successor)
 
     def is_bst(self):
         return self.root.is_bst()

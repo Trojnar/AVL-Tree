@@ -347,6 +347,14 @@ class TreeNode:
         rightmost = self._find_rightmost(max_depth=self.height())
         TreeNode._remove(node, rightmost)
 
+    def swap_nodes(self, second):
+        key = self.__key
+        value = self.value
+        self.__key = second.key
+        self.value = second.value
+        second.__key = key
+        second.value = value
+
 
 class TreeMap:
     """
