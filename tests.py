@@ -802,6 +802,10 @@ class BSTTest(TestCase):
         self.tree_maps["first_tree"].insert(15, None)
         self.assertEqual(len_bef, self.tree_maps["first_tree"].length())
 
+        # reuturns insterted node
+        node = self.tree_maps["first_tree"].insert(89, None)
+        print(repr(node))
+
     def test_find(self):
         node = self.tree_maps["first_tree"].find(15)
         self.assertIsInstance(node, BSTNode)
@@ -896,10 +900,17 @@ class BSTTest(TestCase):
 
 class RBTTest(TestCase):
     def test_setter(self):
-        node = RBTNode(1, None, "Red")
-        print(repr(node))
-        node.color = "black"
-        print(repr(node))
+        node = RBTNode(1, None)
+        self.assertIsInstance(node.left, RBTNode)
+        self.assertIsInstance(node.right, RBTNode)
+        self.assertEqual(node.right, RBTNode(None, None))
+        self.assertEqual(node.left, RBTNode(None, None))
+        self.assertEqual(node.right.right, None)
+        self.assertEqual(node.right.left, None)
+        self.assertEqual(node.left.left, None)
+        self.assertEqual(node.left.right, None)
+        self.assertEqual(node.left.color, "black")
+        self.assertEqual(node.right.color, "black")
 
 
 if __name__ == "__main__":

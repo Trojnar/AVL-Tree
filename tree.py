@@ -24,9 +24,9 @@ class TreeNode:
     def __init__(self, key, value):
         self.__key = key
         self.value = value
-        self.__left = None
-        self.__right = None
-        self.__parent = None
+        self._left = None
+        self._right = None
+        self._parent = None
 
     @property
     def key(self):
@@ -34,34 +34,34 @@ class TreeNode:
 
     @property
     def left(self):
-        return self.__left
+        return self._left
 
     @property
     def right(self):
-        return self.__right
+        return self._right
 
     @property
     def parent(self):
-        return self.__parent
+        return self._parent
 
     @left.setter
     def left(self, new_left):
         if isinstance(new_left, TreeNode):
-            self.__left = new_left
+            self._left = new_left
         else:
             raise Exception("Attribute left should be of type TreeNode.")
 
     @right.setter
     def right(self, new_right):
         if isinstance(new_right, TreeNode):
-            self.__right = new_right
+            self._right = new_right
         else:
             raise Exception("Attribute right should be of type TreeNode.")
 
     @parent.setter
     def parent(self, new_parent):
         if isinstance(new_parent, TreeNode):
-            self.__parent = new_parent
+            self._parent = new_parent
         else:
             raise Exception("Attribute parent should be of type TreeNode.")
 
@@ -894,7 +894,7 @@ class TreeMap:
         # Handling Nones
         if (type(root) == type(None) and type(other) != type(None)) or (
             type(root) != type(None) and type(other) == type(None)
-        ):
+        ):  # TODO XOR !=
             return False
         elif type(root) == type(None) and type(other) == type(None):
             return True
